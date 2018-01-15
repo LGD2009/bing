@@ -40,6 +40,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="12dp"
                 android:textSize="24sp"
+                android:textColor="@android:color/black"
                 tools:text="@string/knowledge_title"/>
 
             <TextView
@@ -47,6 +48,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
                 tools:text="@string/knowledge_subtitle"/>
 
             <TextView
@@ -55,6 +58,8 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
                 android:letterSpacing="0.12"
+                android:textSize="14sp"
+                android:textColor="@android:color/black"
                 android:lineSpacingMultiplier="1.1"
                 tools:text="@string/knowledge_content"/>
 

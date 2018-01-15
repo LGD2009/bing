@@ -24,7 +24,7 @@ import java.util.List;
  * description
  */
 
-public class CoverStoriesActivity extends BaseAppCompatActivity<CoverStoryPresenterImpl> implements ICoverStoryContract.CoverStoryView {
+public class CoverStoriesActivity extends BaseAppCompatActivity<CoverStoryPresenterImpl> implements ICoverStoryContract.CoverStoryView,OnItemClickListener {
 
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
@@ -81,6 +81,11 @@ public class CoverStoriesActivity extends BaseAppCompatActivity<CoverStoryPresen
         Toast.makeText(CoverStoriesActivity.this, s, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void itemClickListener(int position) {
+
+    }
+
 
     public boolean isSlideToBottom(RecyclerView recyclerView) {
         //int itemHeight = layoutManager.getFocusedChild().getHeight();
@@ -90,4 +95,6 @@ public class CoverStoriesActivity extends BaseAppCompatActivity<CoverStoryPresen
 
         return false;
     }
+
+
 }

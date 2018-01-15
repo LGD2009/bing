@@ -40,7 +40,7 @@ public class StoryKnowledgeAdapter extends RecyclerView.Adapter<StoryKnowledgeAd
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.titleText.setText(list.get(position).getKnowledgeTitle());
         holder.subtitleText.setText(list.get(position).getKnowledgeSubtitle());
-        holder.contentText.setText(list.get(position).getKnowledgeContent());
+        holder.contentText.setText(String.format(context.getResources().getString(R.string.space),list.get(position).getKnowledgeContent()));
         Glide.with(context).load(list.get(position).getKnowledgeSrc()).asBitmap().into(holder.image);
     }
 

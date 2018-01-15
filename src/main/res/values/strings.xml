@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Bing</string>
 
+    <string name="space">\u3000\u3000%1$s</string>
 
     <string name="cover_story_content">尽管此时外面天寒地冻，但这只北噪鸦看起来很舒服。我们在西伯利亚的普托拉纳高原拍摄了这张照片，这是一个遥远的北极生态系统，也是世界上最大的驯鹿群的家园。普托拉纳高原的自然景色美得令人吃惊，这个地区有超过25,000个类似峡湾的湖泊，北噪鸦在这里生活的相当自在。</string>
 

@@ -1,11 +1,9 @@
 package com.wallpaper.bing.activity;
 
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -46,23 +44,29 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
     private ImageView wallpaperImage;
     private TextView copyrightText;
     private TextView dateText;
+    private NestedScrollView rootScrollView;
     private ConstraintLayout constraintLayout;
     private String date;
     private String imageUrl;
+    private Typeface fontFace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        fontFace= Typeface.createFromAsset(getAssets(),
+                "fonts/SegoeSlab-SemiLight.ttf");
+
+
         tintManager.setStatusBarTintEnabled(false);
         wallpaperImage = (ImageView) findViewById(R.id.activity_main_image);
 
         constraintLayout = (ConstraintLayout) findViewById(R.id.activity_main_constraint);
-        NestedScrollView scrollView = (NestedScrollView) findViewById(R.id.activity_main_scroll);
+        rootScrollView = (NestedScrollView) findViewById(R.id.activity_main_scroll);
         //展开时顶部留出状态栏
-        scrollView.setPadding(0, tintManager.getConfig().getStatusBarHeight(), 0, 0);
+        rootScrollView.setPadding(0, tintManager.getConfig().getStatusBarHeight(), 0, 0);
 
-        bottomSheetBehavior = BottomSheetBehavior.from(scrollView);
+        bottomSheetBehavior = BottomSheetBehavior.from(rootScrollView);
         copyrightText = (TextView) findViewById(R.id.activity_main_copyright_text);
         dateText = (TextView) findViewById(R.id.activity_main_date_text);
 
@@ -116,6 +120,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
         copyrightText.setText(infoBean.getWallpapersEntity().getCopyright());
 
         dateText.setText(DateUtil.stringToString(date, DateUtil.DatePattern.yyyyMMdd, DateUtil.DatePattern.yyyy_MM_dd));
+        dateText.setTypeface(fontFace);
 
         //设置bottomsheet的peek高度
         copyrightText.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -124,6 +129,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
                 bottomSheetBehavior.setPeekHeight(copyrightText.getHeight() + dateText.getHeight() + tintManager.getConfig().getStatusBarHeight());
             }
         });
+        copyrightText.setTypeface(fontFace);
 
         initBottomSheet(infoBean);
 
@@ -147,11 +153,12 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
         TextView coverContent = (TextView) constraintLayout.findViewById(R.id.activity_main_cover_content);
         TextView storyTitle = (TextView) constraintLayout.findViewById(R.id.activity_main_story_title);
         TextView storySubtitle = (TextView) constraintLayout.findViewById(R.id.activity_main_story_subtitle);
+        coverContent.setTypeface(fontFace);
 
         Glide.with(this).load(infoBean.getCoverStoryEntity().getThumbnail()).into(thumbnail);
         coverAttribute.setText(infoBean.getCoverStoryEntity().getCoverAttribute());
         coverTitle.setText(infoBean.getCoverStoryEntity().getCoverTitle());
-        coverContent.setText(infoBean.getCoverStoryEntity().getContent());
+        coverContent.setText(String.format(getResources().getString(R.string.space),infoBean.getCoverStoryEntity().getContent()));
         storyTitle.setText(infoBean.getCoverStoryEntity().getTitle());
         storySubtitle.setText(infoBean.getCoverStoryEntity().getSubtitle());
 
@@ -185,6 +192,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
                 constraintLayout.setBackgroundColor(Color.argb((int) (155 * slideOffset + 100), (int) (255 * slideOffset), (int) (255 * slideOffset), (int) (255 * slideOffset)));
                 copyrightText.setTextColor(Color.rgb((int) (255 * (1 - slideOffset)), (int) (255 * (1 - slideOffset)), (int) (255 * (1 - slideOffset))));
                 dateText.setTextColor(Color.rgb((int) (255 * (1 - slideOffset)), (int) (255 * (1 - slideOffset)), (int) (255 * (1 - slideOffset))));
+                rootScrollView.smoothScrollTo(0, (int) (bottomSheetBehavior.getPeekHeight()*slideOffset));
             }
         });
 
