@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.wallpaper.bing.activity.MainActivity">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/activity_main_image"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@drawable/homepage_background"
+            android:scaleType="centerCrop"/>
+
+        <ImageView
+            android:id="@+id/activity_main_menu_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="32dp"
+            android:src="@drawable/wallpaper_list"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"/>
+
+        <ImageView
+            android:id="@+id/activity_main_set_wallpaper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/wallpaper_icon"
+            android:scaleType="centerCrop"
+            app:layout_constraintTop_toTopOf="@+id/activity_main_menu_list"
+            app:layout_constraintBottom_toBottomOf="@+id/activity_main_menu_list"
+            app:layout_constraintRight_toLeftOf="@+id/activity_main_menu_list"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+
+    <include layout="@layout/activity_main_bottom"/>
+
+
+
+</android.support.design.widget.CoordinatorLayout>
