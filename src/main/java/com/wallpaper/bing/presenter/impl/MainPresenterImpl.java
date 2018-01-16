@@ -1,13 +1,24 @@
 package com.wallpaper.bing.presenter.impl;
 
+import android.Manifest;
 import android.app.WallpaperManager;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.util.DisplayMetrics;
 
 import com.wallpaper.bing.network.RetrofitHelper;
 import com.wallpaper.bing.network.bean.BaseBean;
 import com.wallpaper.bing.network.bean.WallpaperInfoBean;
 import com.wallpaper.bing.presenter.contract.IMainContract;
 
+import java.util.Arrays;
+
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
@@ -50,18 +61,27 @@ public class MainPresenterImpl implements IMainContract.IMainPresenter {
     }
 
     @Override
-    public void setDesktopWallpaper(String url) {
+    public void setDesktopWallpaper(String firstUrl, String secondUrl) {
         mainView.showDialog();
-        disposable.add(RetrofitHelper.getBingApi().getWallpaper(url)
+        disposable.add(Observable.concatDelayError(Arrays.asList(RetrofitHelper.getBingApi().getWallpaper(firstUrl), RetrofitHelper.getBingApi().getWallpaper(secondUrl)))
+                .firstElement()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<ResponseBody>() {
                     @Override
                     public void accept(@NonNull ResponseBody responseBody) throws Exception {
-                        WallpaperManager manager = WallpaperManager.getInstance(mainView.getContext());
-                        manager.setBitmap(BitmapFactory.decodeStream(responseBody.byteStream()));
-                        mainView.onSuccess("设置成功");
                         mainView.dismissDialog();
+                        mainView.onSuccess(responseBody);
+
+                        Intent intent = new Intent(Intent.ACTION_ATTACH_DATA);
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        intent.putExtra("mimeType", "image/*");
+                        Uri uri = Uri.parse(MediaStore.Images.Media
+                                .insertImage(mainView.getContext().getContentResolver(),
+                                        BitmapFactory.decodeStream(responseBody.byteStream()), "设置壁纸", "a"));
+                        intent.setData(uri);
+                        mainView.getContext().startActivity(intent);
+
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -72,6 +92,27 @@ public class MainPresenterImpl implements IMainContract.IMainPresenter {
                 }));
 
 
+    }
+
+    //如果没有1080x1920的图片，就加载1920x1080的图片
+    @Override
+    public void getWallpaperConcat(String firstUrl, String secondUrl) {
+        disposable.add(Observable.concatDelayError(Arrays.asList(RetrofitHelper.getBingApi().getWallpaper(firstUrl), RetrofitHelper.getBingApi().getWallpaper(secondUrl)))
+                .firstElement()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<ResponseBody>() {
+                    @Override
+                    public void accept(@NonNull ResponseBody responseBody) throws Exception {
+                        mainView.onSuccess(responseBody);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(@NonNull Throwable throwable) throws Exception {
+                        mainView.onFailed(throwable.getMessage());
+                    }
+                })
+        );
     }
 
 

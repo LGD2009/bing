@@ -36,7 +36,7 @@
         tools:text="@string/relevant_title"
         android:gravity="center_vertical"
         android:textColor="@color/colorPrimary"
-        android:textSize="17sp"
+        android:textSize="18sp"
         android:layout_marginLeft="12dp"
         android:layout_marginStart="12dp"/>
 
@@ -44,13 +44,13 @@
         android:id="@+id/item_relevant_content"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintLeft_toLeftOf="@+id/item_relevant_title"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/item_relevant_title"
         tools:text="@string/relevant_content"
         android:letterSpacing="0.11"
-        android:lineSpacingMultiplier="1.1"
+        android:lineSpacingMultiplier="1.4"
         android:textColor="@android:color/black"/>
 
 

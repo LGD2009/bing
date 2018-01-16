@@ -5,19 +5,34 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/wallpaper_list_background"
     android:fitsSystemWindows="true"
-    android:orientation="vertical"
-    android:background="@color/wallpaper_list_background">
+    android:orientation="vertical">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/activity_wallpapers_recycler"
+    <android.support.v7.widget.Toolbar
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        app:layoutManager="LinearLayoutManager"
-        tools:listitem="@layout/item_cover_story">
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="?attr/colorPrimary">
 
-    </android.support.v7.widget.RecyclerView>
+    </android.support.v7.widget.Toolbar>
+
+
+    <cn.bingoogolapple.refreshlayout.BGARefreshLayout
+        android:id="@+id/activity_wallpapers_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/activity_wallpapers_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:layoutManager="LinearLayoutManager"
+            tools:listitem="@layout/item_cover_story">
+
+        </android.support.v7.widget.RecyclerView>
+
+    </cn.bingoogolapple.refreshlayout.BGARefreshLayout>
 
 
 </LinearLayout>

@@ -15,11 +15,9 @@ import com.wallpaper.bing.presenter.IBaseView;
 
 public interface IMainContract {
 
-    interface IMainView extends IBaseView<BaseBean<WallpaperInfoBean>> {
+    interface IMainView extends IBaseView<Object> {
 
         Context getContext();
-
-        void onSuccess(String s);
 
         void showDialog();
 
@@ -31,7 +29,10 @@ public interface IMainContract {
 
         void getWallpaper(String date);
 
-        void setDesktopWallpaper(String url);
+        void setDesktopWallpaper(String firstUrl, String secondUrl);
+
+        void getWallpaperConcat(String firstUrl,String secondUrl);
+
 
     }
 

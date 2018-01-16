@@ -1,11 +1,5 @@
 package com.wallpaper.bing;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.wallpaper.bing.network.bean.BaseBean;
-import com.wallpaper.bing.network.bean.WallpaperInfoBean;
-import com.wallpaper.bing.util.StringUtil;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,20 +8,11 @@ import org.jsoup.select.Elements;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -146,6 +131,27 @@ public class ExampleUnitTest {
         }
     }
 
+    @Test
+    public void testConcatWithObserver() throws InterruptedException {
+        Observable<List<Integer>> just1 = Observable.error(new Throwable("aaa"));
+        Observable<List<Integer>> just2 = Observable.just(Arrays.asList(1, 2, 3));
+
+        Observable.concatDelayError(Arrays.asList(just1,just2))
+                .firstOrError().subscribe(new Consumer<List<Integer>>() {
+            @Override
+            public void accept(List<Integer> list) throws Exception {
+                System.out.println(list.get(0));
+            }
+        }, new Consumer<Throwable>() {
+            @Override
+            public void accept(Throwable throwable) throws Exception {
+                System.out.println(throwable.getMessage());
+            }
+        });
+
+
+
+    }
 
 
 }
