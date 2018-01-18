@@ -4,8 +4,13 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomSheetBehavior;
@@ -14,7 +19,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
@@ -34,13 +41,16 @@ import com.wallpaper.bing.presenter.contract.IMainContract;
 import com.wallpaper.bing.presenter.impl.MainPresenterImpl;
 import com.wallpaper.bing.util.DateUtil;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.ResponseBody;
 
-public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> implements IMainContract.IMainView, View.OnClickListener {
+public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> implements IMainContract.IMainView
+        , Toolbar.OnMenuItemClickListener {
 
     public static String DATE = "WALLPAPER_INFO_DATE";
 
@@ -54,12 +64,17 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
     private String date;    //日期
     private String imageUrl;    //1080x1920 图片的地址
 
-    private int REQUEST_CODE_PERMISSION_STORAGE = 101;
+    private final int LOAD_WALLPAPER = 11;   //加载图片
+    private final int DESKTOP_WALLPAPER = 12;    //设为桌面壁纸
+    private final int DOWNLOAD_WALLPAPER = 13;   //下载图片
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.activity_main_toolbar);
+        toolbar.inflateMenu(R.menu.menu_main);
+        toolbar.setOnMenuItemClickListener(this);
 
         tintManager.setStatusBarTintEnabled(false);
         wallpaperImage = (ImageView) findViewById(R.id.activity_main_image);
@@ -68,19 +83,13 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
         rootScrollView = (NestedScrollView) findViewById(R.id.activity_main_scroll);
         //展开时顶部留出状态栏
         rootScrollView.setPadding(0, tintManager.getConfig().getStatusBarHeight(), 0, 0);
-
         bottomSheetBehavior = BottomSheetBehavior.from(rootScrollView);
         copyrightText = (TextView) findViewById(R.id.activity_main_copyright_text);
         dateText = (TextView) findViewById(R.id.activity_main_date_text);
 
-        findViewById(R.id.activity_main_menu_list).setOnClickListener(this);
-        findViewById(R.id.activity_main_set_wallpaper).setOnClickListener(this);
-
         date = getIntent().getStringExtra(DATE) == null ? DateUtil.getCurrentDate() : getIntent().getStringExtra(DATE);
 
         presenter.getWallpaper(date);
-
-        requestPermission();
 
     }
 
@@ -90,19 +99,25 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.activity_main_menu_list:
-                Intent intent = new Intent(MainActivity.this, CoverStoriesActivity.class);
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_main_desktop:
+                if (!TextUtils.isEmpty(imageUrl)) {
+                    requestPermission(DESKTOP_WALLPAPER);
+                }
+                break;
+            case R.id.menu_main_download:
+                if (!TextUtils.isEmpty(imageUrl)) {
+                    requestPermission(DOWNLOAD_WALLPAPER);
+                }
+                break;
+            case R.id.menu_main_list:
+                Intent intent = new Intent(MainActivity.this, WallpaperListActivity.class);
                 intent.putExtra(DATE, date);
                 startActivity(intent);
                 break;
-            case R.id.activity_main_set_wallpaper:
-                if (!TextUtils.isEmpty(imageUrl)){
-                    requestPermission();
-                }
-                break;
         }
+        return true;
     }
 
     @Override
@@ -116,37 +131,28 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
     }
 
     @Override
-    public void onSuccess(Object object) {
-        if (object instanceof String) {
-            Toast.makeText(MainActivity.this, object.toString(), Toast.LENGTH_SHORT).show();
-        } else if (object instanceof BaseBean) {
-            BaseBean<WallpaperInfoBean> baseBean = (BaseBean<WallpaperInfoBean>) object;
-            WallpaperInfoBean infoBean = baseBean.getMessage();
-            imageUrl = BingUrl.BASE_IMAGE_URL + infoBean.getWallpapersEntity().getImageUrl().replace("1920x1080", "1080x1920");
+    public Context getContext() {
+        return MainActivity.this;
+    }
 
-            presenter.getWallpaperConcat(imageUrl, BingUrl.BASE_IMAGE_URL + infoBean.getWallpapersEntity().getImageUrl());
+    @Override
+    public void onSuccess(BaseBean<WallpaperInfoBean> baseBean) {
+        WallpaperInfoBean infoBean = baseBean.getMessage();
+        imageUrl = BingUrl.BASE_IMAGE_URL + infoBean.getWallpapersEntity().getImageUrl().replace("1920x1080", "1080x1920");
 
-            copyrightText.setText(infoBean.getWallpapersEntity().getCopyright());
-            dateText.setText(DateUtil.stringToString(date, DateUtil.DatePattern.yyyyMMdd, DateUtil.DatePattern.yyyy_MM_dd));
-            //设置bottomsheet的peek高度
-            copyrightText.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    bottomSheetBehavior.setPeekHeight(copyrightText.getHeight() + dateText.getHeight() + tintManager.getConfig().getStatusBarHeight());
-                }
-            });
+        presenter.getWallpaper(imageUrl, BingUrl.BASE_IMAGE_URL + infoBean.getWallpapersEntity().getImageUrl(), LOAD_WALLPAPER);
 
-            initBottomSheet(infoBean);
-
-        } else if (object instanceof ResponseBody) {
-            ResponseBody responseBody = (ResponseBody) object;
-            try {
-                Glide.with(this).load(responseBody.bytes()).asBitmap().animate(R.anim.image_scale).into(wallpaperImage);
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(MainActivity.this, "图片加载错误", Toast.LENGTH_SHORT).show();
+        copyrightText.setText(infoBean.getWallpapersEntity().getCopyright());
+        dateText.setText(DateUtil.stringToString(date, DateUtil.DatePattern.yyyyMMdd, DateUtil.DatePattern.yyyy_MM_dd));
+        //设置bottomsheet的peek高度
+        copyrightText.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                bottomSheetBehavior.setPeekHeight(copyrightText.getHeight() + dateText.getHeight() + tintManager.getConfig().getStatusBarHeight());
             }
-        }
+        });
+
+        initBottomSheet(infoBean);
 
     }
 
@@ -207,8 +213,53 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
     }
 
     @Override
-    public Context getContext() {
-        return this;
+    public void onSuccess(Object bean, int option) {
+        ResponseBody responseBody = (ResponseBody) bean;
+        switch (option) {
+            case DESKTOP_WALLPAPER:
+                presenter.setDesktopWallpaper(BitmapFactory.decodeStream(responseBody.byteStream()));
+                break;
+            case LOAD_WALLPAPER:
+                try {
+                    Glide.with(this).load(responseBody.bytes()).asBitmap().animate(R.anim.image_scale).into(wallpaperImage);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case DOWNLOAD_WALLPAPER:
+                String picName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1).replace("_1080x1920", "");
+                presenter.downloadWallpaper(responseBody.byteStream(),picName);
+                break;
+        }
+    }
+
+
+    //请求存储读写的权限，设置壁纸
+    private void requestPermission(int option) {
+        if (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    option);
+        } else {
+            presenter.getWallpaper(imageUrl, imageUrl.replace("1080x1920", "1920x1080"), option);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == DESKTOP_WALLPAPER || requestCode == DOWNLOAD_WALLPAPER) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //用户已授权
+                presenter.getWallpaper(imageUrl, imageUrl.replace("1080x1920", "1920x1080"), requestCode);
+            } else {
+                //用户拒绝权限
+                Toast.makeText(MainActivity.this, "权限被拒绝，不能设置壁纸", Toast.LENGTH_SHORT).show();
+            }
+        }
+
     }
 
     @Override
@@ -221,31 +272,4 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
         }
     }
 
-    //请求存储读写的权限，设置壁纸
-    private void requestPermission() {
-        if (ContextCompat.checkSelfPermission(
-                this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    REQUEST_CODE_PERMISSION_STORAGE);
-        }else {
-            presenter.setDesktopWallpaper(imageUrl, imageUrl.replace("1080x1920", "1920x1080"));
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_CODE_PERMISSION_STORAGE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //用户已授权
-                presenter.setDesktopWallpaper(imageUrl, imageUrl.replace("1080x1920", "1920x1080"));
-            } else {
-                //用户拒绝权限
-                Toast.makeText(MainActivity.this, "权限被拒绝，不能设置壁纸", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-    }
 }

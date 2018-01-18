@@ -1,11 +1,14 @@
 package com.wallpaper.bing.presenter.contract;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 
 import com.wallpaper.bing.network.bean.BaseBean;
 import com.wallpaper.bing.network.bean.WallpaperInfoBean;
 import com.wallpaper.bing.presenter.IBasePresenter;
 import com.wallpaper.bing.presenter.IBaseView;
+
+import java.io.InputStream;
 
 /**
  * author Gao
@@ -15,13 +18,15 @@ import com.wallpaper.bing.presenter.IBaseView;
 
 public interface IMainContract {
 
-    interface IMainView extends IBaseView<Object> {
+    interface IMainView extends IBaseView<BaseBean<WallpaperInfoBean>> {
 
-        Context getContext();
+        void onSuccess(Object bean,int option);
 
         void showDialog();
 
         void dismissDialog();
+
+        Context getContext();
 
     }
 
@@ -29,10 +34,11 @@ public interface IMainContract {
 
         void getWallpaper(String date);
 
-        void setDesktopWallpaper(String firstUrl, String secondUrl);
+        void getWallpaper(String firstUrl, String secondUrl,int option);
 
-        void getWallpaperConcat(String firstUrl,String secondUrl);
+        void setDesktopWallpaper(Bitmap bitmap);
 
+        void downloadWallpaper(InputStream inputStream, String picName);
 
     }
 

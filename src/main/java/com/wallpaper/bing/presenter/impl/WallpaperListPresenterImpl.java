@@ -3,7 +3,7 @@ package com.wallpaper.bing.presenter.impl;
 import com.wallpaper.bing.network.RetrofitHelper;
 import com.wallpaper.bing.network.bean.BaseBean;
 import com.wallpaper.bing.network.bean.WallpaperBean;
-import com.wallpaper.bing.presenter.contract.ICoverStoryContract;
+import com.wallpaper.bing.presenter.contract.IWallpaperListContract;
 
 import java.util.List;
 
@@ -19,19 +19,19 @@ import io.reactivex.schedulers.Schedulers;
  * description
  */
 
-public class CoverStoryPresenterImpl implements ICoverStoryContract.CoverStoryPresenter {
+public class WallpaperListPresenterImpl implements IWallpaperListContract.CoverStoryPresenter {
 
-    private ICoverStoryContract.CoverStoryView wallpapersView;
+    private IWallpaperListContract.CoverStoryView wallpapersView;
     private CompositeDisposable disposable;
 
-    public CoverStoryPresenterImpl(ICoverStoryContract.CoverStoryView wallpapersView) {
+    public WallpaperListPresenterImpl(IWallpaperListContract.CoverStoryView wallpapersView) {
         this.wallpapersView = wallpapersView;
         disposable = new CompositeDisposable();
     }
 
 
     @Override
-    public void getWallpapers(String date, int page, int pageSize) {
+    public void getWallpapers(String date, int page, int pageSize, final int option) {
         disposable.add(RetrofitHelper.getBingApi().queryWallpapers(date, page, pageSize)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -39,7 +39,7 @@ public class CoverStoryPresenterImpl implements ICoverStoryContract.CoverStoryPr
                     @Override
                     public void accept(@NonNull BaseBean<List<WallpaperBean>> listBaseBean) throws Exception {
                         if (listBaseBean.getStatus().equals("success")) {
-                            wallpapersView.onSuccess(listBaseBean.getMessage());
+                            wallpapersView.onSuccess(listBaseBean.getMessage(),option);
                         } else {
                             wallpapersView.onFailed("请求数据失败");
                         }
