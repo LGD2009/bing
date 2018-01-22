@@ -7,7 +7,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.widget.Toast;
 
-import com.wallpaper.bing.activity.MainActivity;
 import com.wallpaper.bing.network.RetrofitHelper;
 import com.wallpaper.bing.network.bean.BaseBean;
 import com.wallpaper.bing.network.bean.WallpaperInfoBean;
@@ -17,9 +16,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;

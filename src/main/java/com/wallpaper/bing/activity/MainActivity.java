@@ -282,7 +282,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
     @Override
     public void onBackPressed() {
         if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-            finish();
+            super.onBackPressed();
         } else {
             rootScrollView.smoothScrollTo(0, 0);
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
