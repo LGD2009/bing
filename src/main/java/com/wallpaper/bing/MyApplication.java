@@ -3,6 +3,8 @@ package com.wallpaper.bing;
 import android.app.Application;
 import android.graphics.Typeface;
 
+import com.squareup.leakcanary.LeakCanary;
+
 import java.lang.reflect.Field;
 
 /**
@@ -19,6 +21,7 @@ public class MyApplication extends Application {
         super.onCreate();
         initTypeface();
 
+        LeakCanary.install(this);
 
     }
 

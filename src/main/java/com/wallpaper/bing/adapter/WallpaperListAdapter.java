@@ -1,10 +1,12 @@
 package com.wallpaper.bing.adapter;
 
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,6 +24,8 @@ import java.util.ArrayList;
  * description
  */
 public class WallpaperListAdapter extends RecyclerView.Adapter<WallpaperListAdapter.ViewHolder> {
+    private static final int ANIMATED_ITEMS_COUNT = 2;
+    private int lastAnimatedPosition = -1;
 
     private ArrayList<WallpaperBean> list;
     private RequestManager requestManager;
@@ -39,6 +43,9 @@ public class WallpaperListAdapter extends RecyclerView.Adapter<WallpaperListAdap
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+
+        runEnterAnimation(holder.itemView, position);
+
         holder.storyTitleText.setText(list.get(position).getTitle());
         holder.storyAttributeText.setText(list.get(position).getCoverAttribute());
         holder.storyDateText.setText(list.get(position).getDate());
@@ -58,7 +65,7 @@ public class WallpaperListAdapter extends RecyclerView.Adapter<WallpaperListAdap
         return list.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView imageView;
         private TextView storyTitleText;
         private TextView storyAttributeText;
@@ -84,6 +91,22 @@ public class WallpaperListAdapter extends RecyclerView.Adapter<WallpaperListAdap
         }
 
 
+    }
+
+    private void runEnterAnimation(View view, int position) {
+        if (position >= ANIMATED_ITEMS_COUNT - 1) {
+            return;
+        }
+
+        if (position > lastAnimatedPosition) {
+            lastAnimatedPosition = position;
+            view.setTranslationY(view.getY());
+            view.animate()
+                    .translationY(0)
+                    .setInterpolator(new DecelerateInterpolator(3.f))
+                    .setDuration(700)
+                    .start();
+        }
     }
 
     private OnItemClickListener onItemClickListener;

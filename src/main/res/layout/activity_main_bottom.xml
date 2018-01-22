@@ -85,7 +85,7 @@
             android:id="@+id/activity_main_cover_content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:letterSpacing="0.12"
+            android:letterSpacing="0.10"
             android:lineSpacingExtra="2dp"
             android:padding="16dp"
             android:textColor="@android:color/black"

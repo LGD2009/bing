@@ -84,9 +84,9 @@ public abstract class BaseAppCompatActivity<T extends IBasePresenter> extends Ap
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         if (presenter!=null){
             presenter.unSubscribe();
         }
+        super.onDestroy();
     }
 }

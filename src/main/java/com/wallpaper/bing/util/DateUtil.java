@@ -1,5 +1,9 @@
 package com.wallpaper.bing.util;
 
+import android.support.annotation.StringDef;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,28 +20,21 @@ import java.util.Locale;
 @SuppressWarnings("unused")
 public class DateUtil {
 
-
-    public enum DatePattern {
-        yyyy_MM_dd("yyyy-MM-dd"), yyyyMMdd("yyyyMMdd"), yyyySMMSdd("yyyy年MM月dd日");
-
-        private String pattern;
-
-        DatePattern(String pattern) {
-            this.pattern = pattern;
-        }
-
-        public String getPattern() {
-            return pattern;
-        }
-
+    @StringDef({DatePattern.YYYY_MM_DD,DatePattern.YYYYMMDD,DatePattern.YYYYSMMSDD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface DatePattern{
+        String YYYY_MM_DD="yyyy-MM-dd";
+        String YYYYMMDD="yyyyMMdd";
+        String YYYYSMMSDD="yyyySMMSdd";
     }
+
 
     /**
      * 得到格式为20171216的当前日期的String字符串
      */
     public static String getCurrentDate() {
         Date d = new Date();
-        SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
+        SimpleDateFormat sf = new SimpleDateFormat(DatePattern.YYYYMMDD, Locale.CHINA);
         return sf.format(d);
     }
 
@@ -90,9 +87,9 @@ public class DateUtil {
      * @return string
      * @see DatePattern
      */
-    public static String getDateToString(long time, DatePattern pattern) {
+    public static String getDateToString(long time, @DatePattern String pattern) {
         Date d = new Date(time);
-        SimpleDateFormat sf = new SimpleDateFormat(pattern.getPattern(), Locale.CHINA);
+        SimpleDateFormat sf = new SimpleDateFormat(pattern, Locale.CHINA);
         return sf.format(d);
     }
 
@@ -104,8 +101,8 @@ public class DateUtil {
      * @return 时间戳
      * @see DatePattern
      */
-    public static Timestamp stringToDate(String date, DatePattern pattern) {
-        SimpleDateFormat sf = new SimpleDateFormat(pattern.getPattern(), Locale.CHINA);
+    public static Timestamp stringToDate(String date,@DatePattern String pattern) {
+        SimpleDateFormat sf = new SimpleDateFormat(pattern, Locale.CHINA);
         Date d = null;
         try {
             d = sf.parse(date);
@@ -125,8 +122,8 @@ public class DateUtil {
      * @return 转换后的格式
      * @see DatePattern
      */
-    public static String stringToString(String date, DatePattern pattern1, DatePattern pattern2) {
-        SimpleDateFormat sf = new SimpleDateFormat(pattern1.getPattern(), Locale.CHINA);
+    public static String stringToString(String date,@DatePattern String pattern1,@DatePattern String pattern2) {
+        SimpleDateFormat sf = new SimpleDateFormat(pattern1, Locale.CHINA);
         Date d;
         try {
             d = sf.parse(date);
@@ -134,7 +131,7 @@ public class DateUtil {
             e.printStackTrace();
             return "";
         }
-        return new SimpleDateFormat(pattern2.getPattern(), Locale.CHINA).format(d);
+        return new SimpleDateFormat(pattern2, Locale.CHINA).format(d);
     }
 
 }

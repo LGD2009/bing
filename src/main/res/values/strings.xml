@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Bing</string>
+    <string name="app_name">Bing壁纸</string>
 
     <string name="space">\u3000\u3000%1$s</string>
 
@@ -11,5 +11,8 @@
     <string name="knowledge_title">竹鸡</string>
     <string name="knowledge_subtitle">生性好斗的小小鸟</string>
     <string name="knowledge_content">竹鸡亦称"泥滑滑"、"竹鹧鸪"或“扁罐罐”，属鸡形目，雉科。该鸟羽色艳丽，为国内特有的观赏鸟类，在南方为常见种类。它们大多生活在竹林中，形体比鹧鸪小，毛呈褐色而有斑点，喜欢吃白蚁。雄鸟生性好斗，常被人们驯化为斗鸟，以供观赏。此鸟曾于1919年引入日本，很受欢迎。</string>
+
+    <string name="transitionImage">transitionWallpaper</string>
+
 
 </resources>

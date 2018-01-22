@@ -24,6 +24,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:transitionName="transitionImage"
             tools:src="@drawable/tools_card_image"/>
 
         <TextView

@@ -1,16 +1,14 @@
 package com.wallpaper.bing.activity;
 
 import android.Manifest;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomSheetBehavior;
@@ -41,8 +39,6 @@ import com.wallpaper.bing.presenter.contract.IMainContract;
 import com.wallpaper.bing.presenter.impl.MainPresenterImpl;
 import com.wallpaper.bing.util.DateUtil;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,9 +64,11 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
     private final int DESKTOP_WALLPAPER = 12;    //设为桌面壁纸
     private final int DOWNLOAD_WALLPAPER = 13;   //下载图片
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.activity_main_toolbar);
         toolbar.inflateMenu(R.menu.menu_main);
@@ -115,6 +113,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
                 Intent intent = new Intent(MainActivity.this, WallpaperListActivity.class);
                 intent.putExtra(DATE, date);
                 startActivity(intent);
+                overridePendingTransition(0,0);
                 break;
         }
         return true;
@@ -143,7 +142,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
         presenter.getWallpaper(imageUrl, BingUrl.BASE_IMAGE_URL + infoBean.getWallpapersEntity().getImageUrl(), LOAD_WALLPAPER);
 
         copyrightText.setText(infoBean.getWallpapersEntity().getCopyright());
-        dateText.setText(DateUtil.stringToString(date, DateUtil.DatePattern.yyyyMMdd, DateUtil.DatePattern.yyyy_MM_dd));
+        dateText.setText(DateUtil.stringToString(date, DateUtil.DatePattern.YYYYMMDD, DateUtil.DatePattern.YYYY_MM_DD));
         //设置bottomsheet的peek高度
         copyrightText.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -158,7 +157,11 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
 
     @Override
     public void onFailed(String s) {
-        Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
+        if (s.contains("Unable to resolve host")) {
+            Toast.makeText(MainActivity.this, "网络连接出现问题", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void initBottomSheet(WallpaperInfoBean infoBean) {
@@ -228,7 +231,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
                 break;
             case DOWNLOAD_WALLPAPER:
                 String picName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1).replace("_1080x1920", "");
-                presenter.downloadWallpaper(responseBody.byteStream(),picName);
+                presenter.downloadWallpaper(responseBody.byteStream(), picName);
                 break;
         }
     }
@@ -271,5 +274,6 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
     }
+
 
 }

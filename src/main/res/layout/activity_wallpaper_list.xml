@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="@color/wallpaper_list_background"
+    android:background="@android:color/transparent"
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
@@ -25,7 +25,8 @@
     <cn.bingoogolapple.refreshlayout.BGARefreshLayout
         android:id="@+id/activity_wallpapers_list_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/wallpaper_list_background">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/activity_wallpapers_list_recycler"
