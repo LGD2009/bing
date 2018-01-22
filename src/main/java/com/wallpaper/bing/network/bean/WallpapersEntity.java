@@ -7,11 +7,13 @@ import java.sql.Timestamp;
  * time 2017/12/25
  * description
  */
+@SuppressWarnings("unused")
 public class WallpapersEntity {
     private String id;
     private Timestamp date;
     private String copyright;
     private String imageUrl;
+    private String imageUrlMobile;
 
     public String getId() {
         return id;
@@ -45,5 +47,11 @@ public class WallpapersEntity {
         this.imageUrl = imageUrl;
     }
 
+    public String getImageUrlMobile() {
+        return imageUrlMobile;
+    }
 
+    public void setImageUrlMobile(String imageUrlMobile) {
+        this.imageUrlMobile = imageUrlMobile;
+    }
 }

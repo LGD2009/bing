@@ -62,17 +62,16 @@ public class MainPresenterImpl implements IMainContract.IMainPresenter {
     }
 
     @Override
-    public void getWallpaper(String firstUrl, String secondUrl, final int option) {
+    public void getWallpaper(String imageUrl, final int option) {
         mainView.showDialog();
-        disposable.add(Observable.concatDelayError(Arrays.asList(RetrofitHelper.getBingApi().getWallpaper(firstUrl), RetrofitHelper.getBingApi().getWallpaper(secondUrl)))
-                .firstElement()
+        disposable.add(RetrofitHelper.getBingApi().getWallpaper(imageUrl)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<ResponseBody>() {
                     @Override
                     public void accept(@NonNull ResponseBody responseBody) throws Exception {
                         mainView.dismissDialog();
-                        mainView.onSuccess(responseBody,option);
+                        mainView.onSuccess(responseBody, option);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -121,10 +120,10 @@ public class MainPresenterImpl implements IMainContract.IMainPresenter {
             }
             out.flush();
             out.close();
-            Toast.makeText(mainView.getContext(),"保存成功", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mainView.getContext(), "保存成功", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(mainView.getContext(),"保存失败", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mainView.getContext(), "保存失败", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -34,7 +34,7 @@ public interface IMainContract {
 
         void getWallpaper(String date);
 
-        void getWallpaper(String firstUrl, String secondUrl,int option);
+        void getWallpaper(String imageUrl,int option);
 
         void setDesktopWallpaper(Bitmap bitmap);
 

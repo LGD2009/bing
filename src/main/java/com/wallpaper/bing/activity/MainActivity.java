@@ -1,14 +1,17 @@
 package com.wallpaper.bing.activity;
 
 import android.Manifest;
-import android.app.ActivityOptions;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.AnimatorRes;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomSheetBehavior;
@@ -27,6 +30,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.wallpaper.bing.R;
 import com.wallpaper.bing.adapter.StoryKnowledgeAdapter;
 import com.wallpaper.bing.adapter.StoryRelevantAdapter;
@@ -39,7 +44,6 @@ import com.wallpaper.bing.presenter.contract.IMainContract;
 import com.wallpaper.bing.presenter.impl.MainPresenterImpl;
 import com.wallpaper.bing.util.DateUtil;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +64,6 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
     private String date;    //日期
     private String imageUrl;    //1080x1920 图片的地址
 
-    private final int LOAD_WALLPAPER = 11;   //加载图片
     private final int DESKTOP_WALLPAPER = 12;    //设为桌面壁纸
     private final int DOWNLOAD_WALLPAPER = 13;   //下载图片
 
@@ -113,7 +116,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
                 Intent intent = new Intent(MainActivity.this, WallpaperListActivity.class);
                 intent.putExtra(DATE, date);
                 startActivity(intent);
-                overridePendingTransition(0,0);
+                overridePendingTransition(0, 0);
                 break;
         }
         return true;
@@ -137,9 +140,27 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
     @Override
     public void onSuccess(BaseBean<WallpaperInfoBean> baseBean) {
         WallpaperInfoBean infoBean = baseBean.getMessage();
-        imageUrl = BingUrl.BASE_IMAGE_URL + infoBean.getWallpapersEntity().getImageUrl().replace("1920x1080", "1080x1920");
+        imageUrl = BingUrl.BASE_IMAGE_URL + infoBean.getWallpapersEntity().getImageUrlMobile();
 
-        presenter.getWallpaper(imageUrl, BingUrl.BASE_IMAGE_URL + infoBean.getWallpapersEntity().getImageUrl(), LOAD_WALLPAPER);
+        Glide.with(this).load(imageUrl).asBitmap().listener(new RequestListener<String, Bitmap>() {
+            @Override
+            public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
+                return false;
+            }
+
+            @Override
+            public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                ObjectAnimator animatorX = ObjectAnimator.ofFloat(wallpaperImage,
+                        "scaleX", 1.2f, 1f);
+                ObjectAnimator animatorY = ObjectAnimator.ofFloat(wallpaperImage,
+                        "scaleY", 1.2f, 1f);
+                AnimatorSet set = new AnimatorSet();
+                set.setDuration(2000);
+                set.playTogether(animatorX, animatorY);
+                set.start();
+                return false;
+            }
+        }).into(wallpaperImage);
 
         copyrightText.setText(infoBean.getWallpapersEntity().getCopyright());
         dateText.setText(DateUtil.stringToString(date, DateUtil.DatePattern.YYYYMMDD, DateUtil.DatePattern.YYYY_MM_DD));
@@ -222,15 +243,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
             case DESKTOP_WALLPAPER:
                 presenter.setDesktopWallpaper(BitmapFactory.decodeStream(responseBody.byteStream()));
                 break;
-            case LOAD_WALLPAPER:
-                try {
-                    Glide.with(this).load(responseBody.bytes()).asBitmap().animate(R.anim.image_scale).into(wallpaperImage);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                break;
             case DOWNLOAD_WALLPAPER:
-                String picName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1).replace("_1080x1920", "");
+                String picName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
                 presenter.downloadWallpaper(responseBody.byteStream(), picName);
                 break;
         }
@@ -247,7 +261,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     option);
         } else {
-            presenter.getWallpaper(imageUrl, imageUrl.replace("1080x1920", "1920x1080"), option);
+            presenter.getWallpaper(imageUrl, option);
         }
     }
 
@@ -256,7 +270,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
         if (requestCode == DESKTOP_WALLPAPER || requestCode == DOWNLOAD_WALLPAPER) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //用户已授权
-                presenter.getWallpaper(imageUrl, imageUrl.replace("1080x1920", "1920x1080"), requestCode);
+                presenter.getWallpaper(imageUrl, requestCode);
             } else {
                 //用户拒绝权限
                 Toast.makeText(MainActivity.this, "权限被拒绝，不能设置壁纸", Toast.LENGTH_SHORT).show();
@@ -268,7 +282,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
     @Override
     public void onBackPressed() {
         if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-            super.onBackPressed();
+            finish();
         } else {
             rootScrollView.smoothScrollTo(0, 0);
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
