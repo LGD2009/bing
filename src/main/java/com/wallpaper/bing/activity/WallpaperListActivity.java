@@ -5,6 +5,7 @@ import android.app.ActivityOptions;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Point;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,12 +33,18 @@ import com.wallpaper.bing.presenter.contract.IWallpaperListContract;
 import com.wallpaper.bing.presenter.impl.WallpaperListPresenterImpl;
 import com.wallpaper.bing.util.DateUtil;
 
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import cn.bingoogolapple.refreshlayout.BGANormalRefreshViewHolder;
 import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 
 /**
  * author GaoPC
@@ -248,18 +255,26 @@ public class WallpaperListActivity extends BaseAppCompatActivity<WallpaperListPr
 
     }
 
+    private long time=0;    //返回键防抖
+
     @Override
     public void onBackPressed() {
-        startToolbarAnim(toolbar, false);
-        startContentViewAnim(refreshLayout, false);
 
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                WallpaperListActivity.super.onBackPressed();
-            }
-        }, 1000);
+        if (System.currentTimeMillis()-time>1000){
+            startToolbarAnim(toolbar, false);
+            startContentViewAnim(refreshLayout, false);
+
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    WallpaperListActivity.super.onBackPressed();
+                }
+            }, 1000);
+
+            time=System.currentTimeMillis();
+        }
+
 
     }
 
