@@ -28,7 +28,7 @@ public class WallpaperBean {
     private String date;
     private String copyright;
     private String imageUrl;
-    private String imageMobile;
+    private String imageUrlMobile;
     private String coverTitle;
     private String coverAttribute;
     private String thumbnail;
@@ -70,12 +70,12 @@ public class WallpaperBean {
         this.imageUrl = imageUrl;
     }
 
-    public String getImageMobile() {
-        return imageMobile;
+    public String getImageUrlMobile() {
+        return imageUrlMobile;
     }
 
-    public void setImageMobile(String imageMobile) {
-        this.imageMobile = imageMobile;
+    public void setImageUrlMobile(String imageUrlMobile) {
+        this.imageUrlMobile = imageUrlMobile;
     }
 
     public String getCoverTitle() {

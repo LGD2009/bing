@@ -25,6 +25,7 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,6 +54,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
         , Toolbar.OnMenuItemClickListener {
 
     public static String DATE = "WALLPAPER_INFO_DATE";
+    public static String IMAGE_URL = "WALLPAPER_URL";
 
     private BottomSheetBehavior bottomSheetBehavior;
 
@@ -89,6 +91,12 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
         dateText = (TextView) findViewById(R.id.activity_main_date_text);
 
         date = getIntent().getStringExtra(DATE) == null ? DateUtil.getCurrentDate() : getIntent().getStringExtra(DATE);
+        imageUrl = getIntent().getStringExtra(IMAGE_URL) == null ? "" : getIntent().getStringExtra(IMAGE_URL);
+
+        if (!TextUtils.isEmpty(imageUrl)) {
+            //Glide 可以根据地址缓存图片，减少等待时间
+            Glide.with(this).load(imageUrl).asBitmap().into(wallpaperImage);
+        }
 
         presenter.getWallpaper(date);
 
@@ -140,27 +148,29 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
     @Override
     public void onSuccess(BaseBean<WallpaperInfoBean> baseBean) {
         WallpaperInfoBean infoBean = baseBean.getMessage();
-        imageUrl = BingUrl.BASE_IMAGE_URL + infoBean.getWallpapersEntity().getImageUrlMobile();
 
-        Glide.with(this).load(imageUrl).asBitmap().listener(new RequestListener<String, Bitmap>() {
-            @Override
-            public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
-                return false;
-            }
+        if (TextUtils.isEmpty(imageUrl)) {
+            imageUrl = BingUrl.BASE_IMAGE_URL + infoBean.getWallpapersEntity().getImageUrlMobile();
+            Glide.with(this).load(imageUrl).asBitmap().listener(new RequestListener<String, Bitmap>() {
+                @Override
+                public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
+                    return false;
+                }
 
-            @Override
-            public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                ObjectAnimator animatorX = ObjectAnimator.ofFloat(wallpaperImage,
-                        "scaleX", 1.2f, 1f);
-                ObjectAnimator animatorY = ObjectAnimator.ofFloat(wallpaperImage,
-                        "scaleY", 1.2f, 1f);
-                AnimatorSet set = new AnimatorSet();
-                set.setDuration(2000);
-                set.playTogether(animatorX, animatorY);
-                set.start();
-                return false;
-            }
-        }).into(wallpaperImage);
+                @Override
+                public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                    ObjectAnimator animatorX = ObjectAnimator.ofFloat(wallpaperImage,
+                            "scaleX", 1.2f, 1f);
+                    ObjectAnimator animatorY = ObjectAnimator.ofFloat(wallpaperImage,
+                            "scaleY", 1.2f, 1f);
+                    AnimatorSet set = new AnimatorSet();
+                    set.setDuration(2000);
+                    set.playTogether(animatorX, animatorY);
+                    set.start();
+                    return false;
+                }
+            }).into(wallpaperImage);
+        }
 
         copyrightText.setText(infoBean.getWallpapersEntity().getCopyright());
         dateText.setText(DateUtil.stringToString(date, DateUtil.DatePattern.YYYYMMDD, DateUtil.DatePattern.YYYY_MM_DD));
@@ -168,7 +178,11 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
         copyrightText.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                bottomSheetBehavior.setPeekHeight(copyrightText.getHeight() + dateText.getHeight() + tintManager.getConfig().getStatusBarHeight());
+                int peekHeight = copyrightText.getHeight() + dateText.getHeight() + tintManager.getConfig().getStatusBarHeight();
+
+                bottomSheetBehavior.setPeekHeight(peekHeight);
+                rootScrollView.setTranslationY(peekHeight);
+                rootScrollView.animate().translationY(0).setDuration(500).setInterpolator(new DecelerateInterpolator()).start();
             }
         });
 

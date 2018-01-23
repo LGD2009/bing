@@ -5,7 +5,6 @@ import android.app.ActivityOptions;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Point;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,6 +16,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.transition.ChangeImageTransform;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
@@ -28,23 +28,18 @@ import com.bumptech.glide.Glide;
 import com.wallpaper.bing.R;
 import com.wallpaper.bing.adapter.WallpaperListAdapter;
 import com.wallpaper.bing.listener.OnItemClickListener;
+import com.wallpaper.bing.network.BingUrl;
 import com.wallpaper.bing.network.bean.WallpaperBean;
 import com.wallpaper.bing.presenter.contract.IWallpaperListContract;
 import com.wallpaper.bing.presenter.impl.WallpaperListPresenterImpl;
 import com.wallpaper.bing.util.DateUtil;
 
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import cn.bingoogolapple.refreshlayout.BGANormalRefreshViewHolder;
 import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 
 /**
  * author GaoPC
@@ -165,10 +160,11 @@ public class WallpaperListActivity extends BaseAppCompatActivity<WallpaperListPr
         String date = list.get(position).getId();
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(MainActivity.DATE, date);
+        intent.putExtra(MainActivity.IMAGE_URL, BingUrl.BASE_IMAGE_URL + list.get(position).getImageUrlMobile());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForLayoutPosition(position);
+            View targetView = recyclerView.findViewHolderForLayoutPosition(position).itemView.findViewById(R.id.item_wallpaper_list_image);
             ActivityOptions
-                    compat = ActivityOptions.makeSceneTransitionAnimation(this, viewHolder.itemView.findViewById(R.id.item_wallpaper_list_image), getString(R.string.transitionImage));
+                    compat = ActivityOptions.makeSceneTransitionAnimation(this, targetView, getString(R.string.transitionImage));
             ActivityCompat.startActivity(this, intent, compat.toBundle());
         } else {
             startActivity(intent);
@@ -255,12 +251,12 @@ public class WallpaperListActivity extends BaseAppCompatActivity<WallpaperListPr
 
     }
 
-    private long time=0;    //返回键防抖
+    private long time = 0;    //返回键防抖
 
     @Override
     public void onBackPressed() {
 
-        if (System.currentTimeMillis()-time>1000){
+        if (System.currentTimeMillis() - time > 1000) {
             startToolbarAnim(toolbar, false);
             startContentViewAnim(refreshLayout, false);
 
@@ -272,7 +268,7 @@ public class WallpaperListActivity extends BaseAppCompatActivity<WallpaperListPr
                 }
             }, 1000);
 
-            time=System.currentTimeMillis();
+            time = System.currentTimeMillis();
         }
 
 

@@ -54,7 +54,7 @@ public class WallpaperListAdapter extends RecyclerView.Adapter<WallpaperListAdap
         if (TextUtils.isEmpty(list.get(position).getImageUrl())){
             imageUrl=list.get(position).getThumbnail();
         }else {
-            imageUrl = BingUrl.BASE_IMAGE_URL + list.get(position).getImageUrl()+"?x-oss-process=style/640x360";
+            imageUrl = BingUrl.BASE_IMAGE_URL + list.get(position).getImageUrlMobile()+"?x-oss-process=style/640x360";
         }
         requestManager.load(imageUrl).crossFade().into(holder.imageView);
     }
