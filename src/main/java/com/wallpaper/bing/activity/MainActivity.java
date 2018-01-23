@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.AnimatorRes;
 import android.support.annotation.NonNull;
@@ -183,6 +184,11 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
                 bottomSheetBehavior.setPeekHeight(peekHeight);
                 rootScrollView.setTranslationY(peekHeight);
                 rootScrollView.animate().translationY(0).setDuration(500).setInterpolator(new DecelerateInterpolator()).start();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    copyrightText.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }else {
+                    copyrightText.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                }
             }
         });
 
