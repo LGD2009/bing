@@ -15,4 +15,20 @@
     <string name="transitionImage">transitionWallpaper</string>
 
 
+    <string name="title_activity_settings">设置</string>
+    <string name="night_theme">夜间模式</string>
+    <string name="about">关于</string>
+
+
+    <string name="about_description">\u3000\u3000bing壁纸的安卓客户端。可以查看历史壁纸，相关讯息，设置壁纸，下载壁纸。
+        \n\n
+        代码已开源到github,欢迎start
+        \n\n
+        github地址：<a href='https://github.com/LGD2009/bing'>https://github.com/LGD2009/bing</a>
+        \n\n
+        在线地址：
+        <a href='http://www.rampage.xin/bing/'>http://www.rampage.xin/bing</a>
+    </string>
+
+
 </resources>

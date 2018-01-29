@@ -16,7 +16,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.transition.ChangeImageTransform;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
@@ -47,7 +46,7 @@ import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
  * description
  */
 
-public class WallpaperListActivity extends BaseAppCompatActivity<WallpaperListPresenterImpl> implements IWallpaperListContract.CoverStoryView
+public class WallpaperListActivity extends BaseAppCompatActivity<WallpaperListPresenterImpl,List<WallpaperBean>> implements IWallpaperListContract.CoverStoryView
         , OnItemClickListener, BGARefreshLayout.BGARefreshLayoutDelegate {
 
     private Toolbar toolbar;
@@ -134,11 +133,6 @@ public class WallpaperListActivity extends BaseAppCompatActivity<WallpaperListPr
                 break;
         }
         wallpaperListAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onSuccess(List<WallpaperBean> bean) {
-
     }
 
     @Override

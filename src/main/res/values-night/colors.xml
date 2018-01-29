@@ -8,8 +8,8 @@
     <color name="wallpaper_list_background">#E0E0E0</color>
     <color name="wallpaper_cover_background">#40000000</color>
 
-    <color name="textColorNight">@android:color/black</color>
-    <color name="textColorAccentNight">@color/colorAccent</color>
-    <color name="backgroundNight">@color/wallpaper_list_background</color>
+    <color name="textColorNight">@android:color/white</color>
+    <color name="textColorAccentNight">@android:color/white</color>
+    <color name="backgroundNight">#303030</color>
 
 </resources>

@@ -19,20 +19,19 @@ import io.reactivex.schedulers.Schedulers;
  * description
  */
 
-public class WallpaperListPresenterImpl implements IWallpaperListContract.CoverStoryPresenter {
+public class WallpaperListPresenterImpl extends BasePresenterImpl implements IWallpaperListContract.CoverStoryPresenter {
 
     private IWallpaperListContract.CoverStoryView wallpapersView;
-    private CompositeDisposable disposable;
 
     public WallpaperListPresenterImpl(IWallpaperListContract.CoverStoryView wallpapersView) {
+        super(wallpapersView);
         this.wallpapersView = wallpapersView;
-        disposable = new CompositeDisposable();
     }
 
 
     @Override
     public void getWallpapers(String date, int page, int pageSize, final int option) {
-        disposable.add(RetrofitHelper.getBingApi().queryWallpapers(date, page, pageSize)
+        compositeDisposable.add(RetrofitHelper.getBingApi().queryWallpapers(date, page, pageSize)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<BaseBean<List<WallpaperBean>>>() {
@@ -54,9 +53,4 @@ public class WallpaperListPresenterImpl implements IWallpaperListContract.CoverS
 
     }
 
-
-    @Override
-    public void unSubscribe() {
-        disposable.clear();
-    }
 }

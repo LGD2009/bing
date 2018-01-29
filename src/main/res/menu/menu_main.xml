@@ -17,7 +17,13 @@
     <item
         android:id="@+id/menu_main_download"
         android:title="下载"
-        android:icon="@drawable/main_menu_icon"
+        android:icon="@drawable/download_icon"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_main_settings"
+        android:title="@string/title_activity_settings"
+        android:icon="@drawable/settings_icon"
         app:showAsAction="never"/>
 
 </menu>

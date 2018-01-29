@@ -1,0 +1,13 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="night_switch"
+        android:title="@string/night_theme"/>
+
+    <Preference android:title="@string/about">
+        <intent android:action="com.wallpaper.bing.activity.AboutActivity" />
+    </Preference>
+
+
+</PreferenceScreen>

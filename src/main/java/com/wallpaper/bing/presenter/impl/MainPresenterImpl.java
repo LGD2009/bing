@@ -1,6 +1,8 @@
 package com.wallpaper.bing.presenter.impl;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
@@ -16,10 +18,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
@@ -30,19 +32,18 @@ import okhttp3.ResponseBody;
  * description
  */
 
-public class MainPresenterImpl implements IMainContract.IMainPresenter {
+public class MainPresenterImpl extends BasePresenterImpl implements IMainContract.IMainPresenter {
 
-    private CompositeDisposable disposable;
     private IMainContract.IMainView mainView;
 
     public MainPresenterImpl(IMainContract.IMainView mainView) {
+        super(mainView);
         this.mainView = mainView;
-        disposable = new CompositeDisposable();
     }
 
     @Override
     public void getWallpaper(String date) {
-        disposable.add(RetrofitHelper.getBingApi().queryWallpaperInfo(date)
+        compositeDisposable.add(RetrofitHelper.getBingApi().queryWallpaperInfo(date)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<BaseBean<WallpaperInfoBean>>() {
@@ -61,7 +62,7 @@ public class MainPresenterImpl implements IMainContract.IMainPresenter {
     @Override
     public void getWallpaper(String imageUrl, final int option) {
         mainView.showDialog();
-        disposable.add(RetrofitHelper.getBingApi().getWallpaper(imageUrl)
+        compositeDisposable.add(RetrofitHelper.getBingApi().getWallpaper(imageUrl)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<ResponseBody>() {
@@ -86,9 +87,13 @@ public class MainPresenterImpl implements IMainContract.IMainPresenter {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.putExtra("mimeType", "image*//*");
         Uri uri = Uri.parse(MediaStore.Images.Media
-                .insertImage(mainView.getContext().getContentResolver(), bitmap, "设置壁纸", "a"));
+                .insertImage(mainView.getAppCompatContext().getContentResolver(), bitmap, "设置壁纸", "a"));
         intent.setData(uri);
-        (mainView.getContext()).startActivity(intent);
+        PackageManager pm = mainView.getAppCompatContext().getPackageManager();
+        List<ResolveInfo> activities = pm.queryIntentActivities(intent, 0);
+        if (activities.size() > 0) {
+            mainView.getAppCompatContext().startActivity(intent);
+        }
     }
 
     @Override
@@ -98,7 +103,7 @@ public class MainPresenterImpl implements IMainContract.IMainPresenter {
         if (!dirFile.exists()) {
             boolean create = dirFile.mkdirs();
             if (!create) {
-                Toast.makeText(mainView.getContext(), "创建文件夹失败", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mainView.getAppCompatContext(), "创建文件夹失败", Toast.LENGTH_SHORT).show();
                 return;
             }
         }
@@ -106,7 +111,7 @@ public class MainPresenterImpl implements IMainContract.IMainPresenter {
         try {
             boolean newFile = picFile.createNewFile();
             if (!newFile) {
-                Toast.makeText(mainView.getContext(), "创建图片失败", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mainView.getAppCompatContext(), "创建图片失败", Toast.LENGTH_SHORT).show();
                 return;
             }
             FileOutputStream out = new FileOutputStream(picFile);
@@ -117,16 +122,11 @@ public class MainPresenterImpl implements IMainContract.IMainPresenter {
             }
             out.flush();
             out.close();
-            Toast.makeText(mainView.getContext(), "保存成功", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mainView.getAppCompatContext(), "保存成功", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(mainView.getContext(), "保存失败", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mainView.getAppCompatContext(), "保存失败", Toast.LENGTH_SHORT).show();
         }
     }
 
-
-    @Override
-    public void unSubscribe() {
-        disposable.clear();
-    }
 }

@@ -51,7 +51,7 @@
         tools:text="@string/relevant_content"
         android:letterSpacing="0.11"
         android:lineSpacingMultiplier="1.4"
-        android:textColor="@android:color/black"/>
+        android:textColor="@color/textColorNight"/>
 
 
 </android.support.constraint.ConstraintLayout>

@@ -1,10 +1,9 @@
 package com.wallpaper.bing.activity;
 
 import android.Manifest;
-import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.content.Context;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -12,7 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.AnimatorRes;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomSheetBehavior;
@@ -37,6 +36,7 @@ import com.bumptech.glide.request.target.Target;
 import com.wallpaper.bing.R;
 import com.wallpaper.bing.adapter.StoryKnowledgeAdapter;
 import com.wallpaper.bing.adapter.StoryRelevantAdapter;
+import com.wallpaper.bing.fragment.GeneralPreferenceFragment;
 import com.wallpaper.bing.network.BingUrl;
 import com.wallpaper.bing.network.bean.BaseBean;
 import com.wallpaper.bing.network.bean.CoverStoryKnowledgeEntity;
@@ -51,7 +51,7 @@ import java.util.List;
 
 import okhttp3.ResponseBody;
 
-public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> implements IMainContract.IMainView
+public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl, BaseBean<WallpaperInfoBean>> implements IMainContract.IMainView
         , Toolbar.OnMenuItemClickListener {
 
     public static String DATE = "WALLPAPER_INFO_DATE";
@@ -74,8 +74,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.activity_main_toolbar);
         toolbar.inflateMenu(R.menu.menu_main);
         toolbar.setOnMenuItemClickListener(this);
@@ -127,6 +127,13 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
                 startActivity(intent);
                 overridePendingTransition(0, 0);
                 break;
+            case R.id.menu_main_settings:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    startActivity(new Intent(MainActivity.this, SettingsActivity.class), ActivityOptions.makeSceneTransitionAnimation(MainActivity.this).toBundle());
+                } else {
+                    startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                }
+                break;
         }
         return true;
     }
@@ -139,11 +146,6 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
     @Override
     public void dismissDialog() {
         dismissProgressDialog();
-    }
-
-    @Override
-    public Context getContext() {
-        return MainActivity.this;
     }
 
     @Override
@@ -184,11 +186,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
                 bottomSheetBehavior.setPeekHeight(peekHeight);
                 rootScrollView.setTranslationY(peekHeight);
                 rootScrollView.animate().translationY(0).setDuration(500).setInterpolator(new DecelerateInterpolator()).start();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    copyrightText.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                }else {
-                    copyrightText.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                }
+                copyrightText.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
 
@@ -248,9 +246,15 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                constraintLayout.setBackgroundColor(Color.argb((int) (155 * slideOffset + 100), (int) (255 * slideOffset), (int) (255 * slideOffset), (int) (255 * slideOffset)));
-                copyrightText.setTextColor(Color.rgb((int) (255 * (1 - slideOffset)), (int) (255 * (1 - slideOffset)), (int) (255 * (1 - slideOffset))));
-                dateText.setTextColor(Color.rgb((int) (255 * (1 - slideOffset)), (int) (255 * (1 - slideOffset)), (int) (255 * (1 - slideOffset))));
+                boolean isNight = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean(GeneralPreferenceFragment.NIGHT_SWITCH, false);
+                if (isNight) {
+                    constraintLayout.setBackgroundColor(Color.argb((int) (155 * slideOffset + 100), (int) (48 * slideOffset), (int) (48 * slideOffset), (int) (48 * slideOffset)));
+                } else {
+                    constraintLayout.setBackgroundColor(Color.argb((int) (155 * slideOffset + 100), (int) (255 * slideOffset), (int) (255 * slideOffset), (int) (255 * slideOffset)));
+                    copyrightText.setTextColor(Color.rgb((int) (255 * (1 - slideOffset)), (int) (255 * (1 - slideOffset)), (int) (255 * (1 - slideOffset))));
+                    dateText.setTextColor(Color.rgb((int) (255 * (1 - slideOffset)), (int) (255 * (1 - slideOffset)), (int) (255 * (1 - slideOffset))));
+                }
+
             }
         });
 
@@ -308,6 +312,5 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl> imple
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
     }
-
 
 }

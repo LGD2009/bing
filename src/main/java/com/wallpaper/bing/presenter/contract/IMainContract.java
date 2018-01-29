@@ -1,6 +1,5 @@
 package com.wallpaper.bing.presenter.contract;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.wallpaper.bing.network.bean.BaseBean;
@@ -25,8 +24,6 @@ public interface IMainContract {
         void showDialog();
 
         void dismissDialog();
-
-        Context getContext();
 
     }
 
