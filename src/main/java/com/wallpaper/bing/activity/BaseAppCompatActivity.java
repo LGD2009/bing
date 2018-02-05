@@ -54,7 +54,8 @@ public abstract class BaseAppCompatActivity<P extends BasePresenterImpl,T> exten
 
         presenter = createPresenter();
         if (presenter != null) {
-            presenter.setOnChangeNightListener();
+            //切换夜间模式
+            presenter.setOnChangeNightListener(savedInstanceState);
         }
 
     }
