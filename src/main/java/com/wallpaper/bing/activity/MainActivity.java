@@ -7,7 +7,6 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -67,7 +66,6 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl, BaseB
     private String date;    //日期
     private String imageUrl;    //1080x1920 图片的地址
 
-    private final int DESKTOP_WALLPAPER = 12;    //设为桌面壁纸
     private final int DOWNLOAD_WALLPAPER = 13;   //下载图片
 
 
@@ -112,9 +110,9 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl, BaseB
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_main_desktop:
-                if (!TextUtils.isEmpty(imageUrl)) {
-                    requestPermission(DESKTOP_WALLPAPER);
-                }
+                wallpaperImage.setDrawingCacheEnabled(true);
+                presenter.setDesktopWallpaper(wallpaperImage.getDrawingCache());
+                wallpaperImage.setDrawingCacheEnabled(false);
                 break;
             case R.id.menu_main_download:
                 if (!TextUtils.isEmpty(imageUrl)) {
@@ -264,9 +262,6 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl, BaseB
     public void onSuccess(Object bean, int option) {
         ResponseBody responseBody = (ResponseBody) bean;
         switch (option) {
-            case DESKTOP_WALLPAPER:
-                presenter.setDesktopWallpaper(BitmapFactory.decodeStream(responseBody.byteStream()));
-                break;
             case DOWNLOAD_WALLPAPER:
                 String picName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
                 presenter.downloadWallpaper(responseBody.byteStream(), picName);
@@ -291,13 +286,13 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl, BaseB
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == DESKTOP_WALLPAPER || requestCode == DOWNLOAD_WALLPAPER) {
+        if (requestCode == DOWNLOAD_WALLPAPER) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //用户已授权
                 presenter.getWallpaper(imageUrl, requestCode);
             } else {
                 //用户拒绝权限
-                Toast.makeText(MainActivity.this, "权限被拒绝，不能设置壁纸", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "权限被拒绝，不能下载壁纸", Toast.LENGTH_SHORT).show();
             }
         }
 

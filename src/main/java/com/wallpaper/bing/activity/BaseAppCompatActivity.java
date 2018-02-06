@@ -116,4 +116,5 @@ public abstract class BaseAppCompatActivity<P extends BasePresenterImpl,T> exten
     public void onFailed(String s) {
 
     }
+
 }

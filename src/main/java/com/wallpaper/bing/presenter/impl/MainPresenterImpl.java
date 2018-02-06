@@ -1,12 +1,9 @@
 package com.wallpaper.bing.presenter.impl;
 
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
+import android.app.WallpaperManager;
+import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.widget.Toast;
 
 import com.wallpaper.bing.network.RetrofitHelper;
@@ -18,7 +15,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.lang.ref.WeakReference;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
@@ -83,17 +80,14 @@ public class MainPresenterImpl extends BasePresenterImpl implements IMainContrac
 
     @Override
     public void setDesktopWallpaper(Bitmap bitmap) {
-        Intent intent = new Intent(Intent.ACTION_ATTACH_DATA);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.putExtra("mimeType", "image*//*");
-        Uri uri = Uri.parse(MediaStore.Images.Media
-                .insertImage(mainView.getAppCompatContext().getContentResolver(), bitmap, "设置壁纸", "a"));
-        intent.setData(uri);
-        PackageManager pm = mainView.getAppCompatContext().getPackageManager();
-        List<ResolveInfo> activities = pm.queryIntentActivities(intent, 0);
-        if (activities.size() > 0) {
-            mainView.getAppCompatContext().startActivity(intent);
+        WallpaperManager wallpaperManager = WallpaperManager.getInstance(mainView.getAppCompatContext().getApplicationContext());
+        try {
+            wallpaperManager.setBitmap(bitmap);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(mainView.getAppCompatContext(),"设置壁纸失败", Toast.LENGTH_SHORT).show();
         }
+        Toast.makeText(mainView.getAppCompatContext(),"设置壁纸成功", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -111,7 +105,7 @@ public class MainPresenterImpl extends BasePresenterImpl implements IMainContrac
         try {
             boolean newFile = picFile.createNewFile();
             if (!newFile) {
-                Toast.makeText(mainView.getAppCompatContext(), "创建图片失败", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mainView.getAppCompatContext(), "创建图片失败,可能图片已存在", Toast.LENGTH_SHORT).show();
                 return;
             }
             FileOutputStream out = new FileOutputStream(picFile);

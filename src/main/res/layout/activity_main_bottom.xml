@@ -81,12 +81,11 @@
             app:layout_constraintRight_toRightOf="@+id/activity_main_story_thumbnail"
             tools:text="安静乖巧的噪鸦"/>
 
-        <TextView
+        <com.wallpaper.bing.view.JustifyTextView
             android:id="@+id/activity_main_cover_content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:letterSpacing="0.10"
-            android:lineSpacingExtra="2dp"
+            android:lineSpacingExtra="1dp"
             android:padding="16dp"
             android:textColor="@color/textColorNight"
             android:textSize="16sp"
