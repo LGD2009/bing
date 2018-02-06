@@ -1,9 +1,9 @@
 package com.wallpaper.bing.presenter.impl;
 
 import android.app.WallpaperManager;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.wallpaper.bing.network.RetrofitHelper;
@@ -15,8 +15,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
@@ -79,15 +81,35 @@ public class MainPresenterImpl extends BasePresenterImpl implements IMainContrac
     }
 
     @Override
-    public void setDesktopWallpaper(Bitmap bitmap) {
-        WallpaperManager wallpaperManager = WallpaperManager.getInstance(mainView.getAppCompatContext().getApplicationContext());
-        try {
-            wallpaperManager.setBitmap(bitmap);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(mainView.getAppCompatContext(),"设置壁纸失败", Toast.LENGTH_SHORT).show();
-        }
-        Toast.makeText(mainView.getAppCompatContext(),"设置壁纸成功", Toast.LENGTH_SHORT).show();
+    public void setDesktopWallpaper(final Bitmap bitmap) {
+        mainView.showDialog();
+        final Bitmap cacheBitmap = Bitmap.createBitmap(bitmap);
+        compositeDisposable.add(Observable.create(new ObservableOnSubscribe<String>() {
+
+            @Override
+            public void subscribe(@NonNull ObservableEmitter<String> emitter) throws Exception {
+                WallpaperManager wallpaperManager = WallpaperManager.getInstance(mainView.getAppCompatContext().getApplicationContext());
+                wallpaperManager.setBitmap(cacheBitmap);
+                emitter.onNext("设置壁纸成功");
+                emitter.onComplete();
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Exception {
+                        Toast.makeText(mainView.getAppCompatContext(), s, Toast.LENGTH_SHORT).show();
+                        cacheBitmap.recycle();
+                        mainView.dismissDialog();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Toast.makeText(mainView.getAppCompatContext(), "设置壁纸失败", Toast.LENGTH_SHORT).show();
+                        cacheBitmap.recycle();
+                        mainView.dismissDialog();
+                    }
+                }));
     }
 
     @Override
