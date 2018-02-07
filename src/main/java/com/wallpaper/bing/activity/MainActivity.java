@@ -74,8 +74,12 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl, BaseB
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        date = getIntent().getStringExtra(DATE) == null ? DateUtil.getCurrentDate() : getIntent().getStringExtra(DATE);
+        imageUrl = getIntent().getStringExtra(IMAGE_URL) == null ? "" : getIntent().getStringExtra(IMAGE_URL);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.activity_main_toolbar);
-        toolbar.inflateMenu(R.menu.menu_main);
+        //如果是从WallpaperListActivity进入，隐藏“浏览其他壁纸和设置选项”
+        toolbar.inflateMenu(TextUtils.isEmpty(imageUrl) ? R.menu.menu_main : R.menu.menu_main_list);
         toolbar.setOnMenuItemClickListener(this);
 
         tintManager.setStatusBarTintEnabled(false);
@@ -88,9 +92,6 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl, BaseB
         bottomSheetBehavior = BottomSheetBehavior.from(rootScrollView);
         copyrightText = (TextView) findViewById(R.id.activity_main_copyright_text);
         dateText = (TextView) findViewById(R.id.activity_main_date_text);
-
-        date = getIntent().getStringExtra(DATE) == null ? DateUtil.getCurrentDate() : getIntent().getStringExtra(DATE);
-        imageUrl = getIntent().getStringExtra(IMAGE_URL) == null ? "" : getIntent().getStringExtra(IMAGE_URL);
 
         if (!TextUtils.isEmpty(imageUrl)) {
             //Glide 可以根据地址缓存图片，减少等待时间

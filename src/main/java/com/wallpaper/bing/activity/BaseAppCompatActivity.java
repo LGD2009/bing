@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
@@ -38,6 +39,7 @@ public abstract class BaseAppCompatActivity<P extends BasePresenterImpl,T> exten
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             setTranslucentStatus(true);
         }
+        //设置状态栏颜色
         tintManager = new SystemBarTintManager(this);
         tintManager.setStatusBarTintEnabled(true);
         if (statusBarTintColor() == 0) {
@@ -52,6 +54,7 @@ public abstract class BaseAppCompatActivity<P extends BasePresenterImpl,T> exten
         boolean isNight = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(GeneralPreferenceFragment.NIGHT_SWITCH, false);
         getDelegate().setLocalNightMode(isNight ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
 
+        //初始化presenter
         presenter = createPresenter();
         if (presenter != null) {
             //切换夜间模式
@@ -62,7 +65,11 @@ public abstract class BaseAppCompatActivity<P extends BasePresenterImpl,T> exten
 
     protected abstract P createPresenter();
 
-    protected int statusBarTintColor() {
+    /**
+     * statusBar 颜色
+     * @return 0-默认主题色，或者返回其他int类型的颜色
+     */
+    protected @ColorInt int statusBarTintColor() {
         return 0;
     }
 
