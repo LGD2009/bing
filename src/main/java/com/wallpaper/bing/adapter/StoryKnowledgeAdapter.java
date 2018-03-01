@@ -1,12 +1,16 @@
 package com.wallpaper.bing.adapter;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.wallpaper.bing.R;
@@ -49,7 +53,7 @@ public class StoryKnowledgeAdapter extends RecyclerView.Adapter<StoryKnowledgeAd
         return list.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
         private TextView titleText,subtitleText,contentText;
         private ImageView image;
 
@@ -59,8 +63,24 @@ public class StoryKnowledgeAdapter extends RecyclerView.Adapter<StoryKnowledgeAd
             titleText= (TextView) itemView.findViewById(R.id.item_knowledge_title);
             subtitleText= (TextView) itemView.findViewById(R.id.item_knowledge_subtitle);
             contentText= (TextView) itemView.findViewById(R.id.item_knowledge_content);
+
+            contentText.setOnLongClickListener(this);
         }
 
+        @Override
+        public boolean onLongClick(View v) {
+            ClipboardManager clipboardManager =
+                    (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            if (!TextUtils.isEmpty(((TextView)v).getText())){
+                String text = ((TextView)v).getText().toString();
+                ClipData clipData = ClipData.newPlainText("text", text);
+                if (clipboardManager != null) {
+                    clipboardManager.setPrimaryClip(clipData);
+                    Toast.makeText(context,"文本已复制到剪切板", Toast.LENGTH_SHORT).show();
+                }
+            }
+            return true;
+        }
     }
 
 }

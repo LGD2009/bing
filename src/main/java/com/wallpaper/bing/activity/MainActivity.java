@@ -4,6 +4,9 @@ import android.Manifest;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -51,7 +54,7 @@ import java.util.List;
 import okhttp3.ResponseBody;
 
 public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl, BaseBean<WallpaperInfoBean>> implements IMainContract.IMainView
-        , Toolbar.OnMenuItemClickListener {
+        , Toolbar.OnMenuItemClickListener,View.OnLongClickListener {
 
     public static String DATE = "WALLPAPER_INFO_DATE";
     public static String IMAGE_URL = "WALLPAPER_URL";
@@ -175,6 +178,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl, BaseB
         }
 
         copyrightText.setText(infoBean.getWallpapersEntity().getCopyright());
+        copyrightText.setOnLongClickListener(this);
+
         dateText.setText(DateUtil.stringToString(date, DateUtil.DatePattern.YYYYMMDD, DateUtil.DatePattern.YYYY_MM_DD));
         //设置bottomsheet的peek高度
         copyrightText.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -210,6 +215,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl, BaseB
         TextView coverContent = (TextView) constraintLayout.findViewById(R.id.activity_main_cover_content);
         TextView storyTitle = (TextView) constraintLayout.findViewById(R.id.activity_main_story_title);
         TextView storySubtitle = (TextView) constraintLayout.findViewById(R.id.activity_main_story_subtitle);
+
+        coverContent.setOnLongClickListener(this);
 
         Glide.with(this).load(infoBean.getCoverStoryEntity().getThumbnail()).into(thumbnail);
         coverAttribute.setText(infoBean.getCoverStoryEntity().getCoverAttribute());
@@ -270,6 +277,26 @@ public class MainActivity extends BaseAppCompatActivity<MainPresenterImpl, BaseB
         }
     }
 
+
+    @Override
+    public boolean onLongClick(View v) {
+        switch (v.getId()){
+            case R.id.activity_main_cover_content:
+            case R.id.activity_main_copyright_text:
+                ClipboardManager clipboardManager =
+                        (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                if (!TextUtils.isEmpty(((TextView)v).getText())){
+                    String text = ((TextView)v).getText().toString();
+                    ClipData clipData = ClipData.newPlainText("text", text);
+                    if (clipboardManager != null) {
+                        clipboardManager.setPrimaryClip(clipData);
+                        Toast.makeText(MainActivity.this,"文本已复制到剪切板", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                break;
+        }
+        return true;
+    }
 
     //请求存储读写的权限，设置壁纸
     private void requestPermission(int option) {

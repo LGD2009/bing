@@ -3,6 +3,7 @@ package com.wallpaper.bing.network;
 import com.wallpaper.bing.network.bean.BaseBean;
 import com.wallpaper.bing.network.bean.WallpaperBean;
 import com.wallpaper.bing.network.bean.WallpaperInfoBean;
+import com.wallpaper.bing.network.bean.WallpapersEntity;
 
 import java.util.List;
 
@@ -48,5 +49,12 @@ public interface BingApi {
      */
     @GET
     Observable<ResponseBody> getWallpaper(@Url String url);
+
+    /**
+     * 得到最近的壁纸信息
+     * @return WallpapersEntity
+     */
+    @GET("wallpapers/currentWallpaperEntity")
+    Observable<BaseBean<WallpapersEntity>> getLastWallpaper();
 
 }
