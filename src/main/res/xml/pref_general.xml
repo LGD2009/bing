@@ -5,11 +5,11 @@
         android:key="night_switch"
         android:title="@string/night_theme"/>
 
-    <SwitchPreference
+<!--    <SwitchPreference
         android:defaultValue="false"
         android:key="auto_change_wallpaper"
         android:title="@string/auto_change_wallpaper"
-        android:summary="@string/auto_change_wallpaper_description"/>
+        android:summary="@string/auto_change_wallpaper_description"/>-->
 
     <Preference android:title="@string/about">
         <intent android:action="com.wallpaper.bing.activity.AboutActivity" />

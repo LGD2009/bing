@@ -29,9 +29,9 @@ public class GeneralPreferenceFragment extends PreferenceFragment implements Pre
         setHasOptionsMenu(false);
 
         Preference nightSwitch = findPreference(NIGHT_SWITCH);
-        Preference autoChangeSwitch = findPreference(AUTO_CHANGE_WALLPAPER);
+        //Preference autoChangeSwitch = findPreference(AUTO_CHANGE_WALLPAPER);
         nightSwitch.setOnPreferenceChangeListener(this);
-        autoChangeSwitch.setOnPreferenceChangeListener(this);
+        //autoChangeSwitch.setOnPreferenceChangeListener(this);
     }
 
 
