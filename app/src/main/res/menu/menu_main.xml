@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_main_list"
+        android:title="浏览其他壁纸"
+        android:icon="@drawable/wallpaper_list"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_main_desktop"
+        android:title="设为桌面壁纸"
+        android:icon="@drawable/main_menu_icon"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_main_download"
+        android:title="下载"
+        android:icon="@drawable/download_icon"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_main_settings"
+        android:title="@string/title_activity_settings"
+        android:icon="@drawable/settings_icon"
+        app:showAsAction="never"/>
+
+</menu>

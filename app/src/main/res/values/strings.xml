@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Bing每日壁纸</string>
+
+    <string name="space">\u3000\u3000%1$s</string>
+
+    <string name="cover_story_content">尽管此时外面天寒地冻，但这只北噪鸦看起来很舒服。我们在西伯利亚的普托拉纳高原拍摄了这张照片，这是一个遥远的北极生态系统，也是世界上最大的驯鹿群的家园。普托拉纳高原的自然景色美得令人吃惊，这个地区有超过25,000个类似峡湾的湖泊，北噪鸦在这里生活的相当自在。</string>
+
+    <string name="relevant_title">夏津白玉鸟</string>
+    <string name="relevant_content">夏津白玉鸟，又名金丝雀、芙蓉鸟，亦称雪雀，俗称黄雀。其饲养史可上溯至明初，迄今已有600余年的历史。白玉鸟体形健美，略长于云雀，善啼，其啼声清脆婉转，交配期啼声终日不绝，久喂后可仿人吹口哨。平时以生熟小米为食，春、夏、秋加饲苦菜，初春和冬季喂以菠菜。</string>
+
+    <string name="knowledge_title">竹鸡</string>
+    <string name="knowledge_subtitle">生性好斗的小小鸟</string>
+    <string name="knowledge_content">竹鸡亦称"泥滑滑"、"竹鹧鸪"或“扁罐罐”，属鸡形目，雉科。该鸟羽色艳丽，为国内特有的观赏鸟类，在南方为常见种类。它们大多生活在竹林中，形体比鹧鸪小，毛呈褐色而有斑点，喜欢吃白蚁。雄鸟生性好斗，常被人们驯化为斗鸟，以供观赏。此鸟曾于1919年引入日本，很受欢迎。</string>
+
+    <string name="transitionImage">transitionWallpaper</string>
+
+
+    <string name="title_activity_settings">设置</string>
+    <string name="night_theme">夜间模式</string>
+    <string name="auto_change_wallpaper">自动设置壁纸</string>
+    <string name="auto_change_wallpaper_description">需要自启动权限</string>
+    <string name="about">关于</string>
+
+
+    <string name="about_description">\u3000\u3000bing壁纸的安卓客户端。可以查看历史壁纸，相关讯息，设置壁纸，下载壁纸。
+        \n\n
+        代码已开源到github,欢迎start。
+        \n\n
+        github地址：<a href='https://github.com/LGD2009/bing'>https://github.com/LGD2009/bing</a>
+        \n\n
+        在线地址：
+        <a href='http://www.rampage.xin/bing/'>http://www.rampage.xin/bing</a>
+    </string>
+
+
+</resources>
